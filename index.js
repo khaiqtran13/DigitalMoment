@@ -31,10 +31,34 @@ MongoClient.connect('mongodb+srv://code-to-give:LzO8l9BxQm5istgt@cluster0.gmq4xz
         app.post('/posts', (req, res) => {
             console.log(req.body)
             postsCollection.insertOne(req.body).then(
-                res.status(200).send("Created posts!")
+                res.status(200).send(res.body)
             ).catch(
                 error => console.error(error)
             )
         })
 
-    })
+        app.get('/posts', (req, res) => {
+            postsCollection.find().toArray()
+                .then(results => {
+                    res.json(results)
+                })
+                .catch(error => console.error(error))
+        })
+
+        app.put('/posts', (req, res) => {
+            postsCollection.findOneAndUpdate({_id: req.body.id},
+                {
+                    $set: {
+                        type: req.body.type,
+                        content: req.body.content
+                    }
+                },
+                {
+                    upsert: true
+                }
+            ).then(result => { res.status(200) }).catch(error => console.error(error))
+        }
+        )
+    }
+
+)
